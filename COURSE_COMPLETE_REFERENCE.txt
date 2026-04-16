@@ -1,0 +1,1711 @@
+================================================================================
+  COMPLETE AI AGENTIC ENGINEERING COURSE — REFERENCE DOCUMENT
+  "The Complete Agentic AI Engineering Course" by Ed Donner
+  Compiled: April 2026
+================================================================================
+
+INSTRUCTOR: Ed Donner (ed@edwarddonner.com)
+LinkedIn:   https://www.linkedin.com/in/eddonner/
+X/Twitter:  https://x.com/edwarddonner
+Course Page:https://edwarddonner.com/2025/04/21/the-complete-agentic-ai-engineering-course/
+FAQ:        https://edwarddonner.com/faq
+Curriculum: https://edwarddonner.com/curriculum
+
+================================================================================
+  TABLE OF CONTENTS
+================================================================================
+
+  PART 1: COURSE OVERVIEW & SETUP
+  PART 2: MODULE 1 — Foundations (Week 1)
+  PART 3: MODULE 2 — OpenAI Agents SDK (Week 2)
+  PART 4: MODULE 3 — CrewAI (Week 3)
+  PART 5: MODULE 4 — LangGraph (Week 4)
+  PART 6: MODULE 5 — AutoGen (Week 5)
+  PART 7: MODULE 6 — MCP: Model Context Protocol (Week 6)
+  PART 8: SUMMARY TABLE
+  PART 9: CAN GOOGLE GEMINI FREE API REPLACE EVERYTHING IN THIS CODEBASE?
+
+================================================================================
+  PART 1: COURSE OVERVIEW & SETUP
+================================================================================
+
+WHAT THIS COURSE IS:
+--------------------
+A 6-week, hands-on engineering intensive covering the entire modern Agentic AI
+stack. The course takes you from raw API calls to a live, autonomous multi-agent
+trading system running in production.
+
+COURSE QUOTE:
+  "This is the start of your 6 week adventure into the powerful, astonishing
+   and often surreal world of Agentic AI."
+
+TOOLS COVERED (one per week):
+  Week 1 — Raw API (OpenAI, Anthropic, Google, DeepSeek, Groq, Ollama)
+  Week 2 — OpenAI Agents SDK
+  Week 3 — CrewAI
+  Week 4 — LangGraph
+  Week 5 — AutoGen
+  Week 6 — Model Context Protocol (MCP)
+
+SETUP GUIDES:
+  Windows:  setup/SETUP-PC.md
+  Mac:      setup/SETUP-mac.md
+  Linux:    setup/SETUP-linux.md
+  WSL:      setup/SETUP-WSL.md
+  Node.js:  setup/SETUP-node.md
+  Notebook Troubleshooting: setup/troubleshooting.ipynb
+
+PYTHON VERSION: >= 3.12
+PACKAGE MANAGER: uv
+
+KEY DEPENDENCIES (from requirements.txt / pyproject.toml):
+  openai >= 1.68.2                         — Core OpenAI API client
+  openai-agents >= 0.0.15                  — OpenAI Agents SDK
+  anthropic >= 0.49.0                      — Anthropic Claude models
+  autogen-agentchat >= 0.4.9.2             — AutoGen AgentChat framework
+  autogen-ext[grpc,mcp,ollama,openai] >= 0.4.9.2 — AutoGen extensions
+  langchain-openai >= 0.3.9                — LangChain + OpenAI integration
+  langchain-anthropic >= 0.3.10            — LangChain + Claude integration
+  langchain-community >= 0.3.20            — LangChain community tools
+  langchain-experimental >= 0.3.4          — Experimental LangChain features
+  langgraph >= 0.3.18                      — LangGraph agent graph framework
+  langgraph-checkpoint-sqlite >= 2.0.6     — SQLite persistent checkpointing
+  mcp[cli] >= 1.5.0                        — Model Context Protocol
+  mcp-server-fetch >= 2025.1.17            — MCP fetch server
+  gradio >= 5.22.0                         — Rapid web UI builder
+  pypdf >= 5.4.0                           — PDF reading/parsing
+  sendgrid >= 6.11.0                       — Email sending (optional)
+  polygon-api-client >= 1.14.5             — Polygon.io financial data
+  playwright >= 1.51.0                     — Browser automation
+  semantic-kernel >= 1.25.0               — Microsoft Semantic Kernel
+  pydantic (transitive)                    — Structured outputs / data models
+  python-dotenv >= 1.0.1                   — .env file loading
+  rich                                     — Colored terminal output
+  nest_asyncio                             — Async support in notebooks
+  langchain-google-genai                   — LangChain + Google Gemini
+
+IMPORTANT NOTES:
+  - CrewAI (Week 3) needs Microsoft Build Tools on Windows.
+    Command: uv tool install crewai==0.130.0 --python 3.12
+  - MCP on Windows has issues; use WSL for MCP servers (setup/SETUP-WSL.md)
+  - Monitor API usage: https://platform.openai.com/usage
+  - Guides folder contains deeper Python/setup explanations: guides/
+  - API costs guide: guides/09_ai_apis_and_ollama.ipynb
+
+================================================================================
+  PART 2: MODULE 1 — FOUNDATIONS
+  Folder: 1_foundations/
+================================================================================
+
+OVERVIEW:
+  This module teaches the raw fundamentals before any framework. You learn
+  to speak directly with LLM APIs, compare multiple providers, build UI,
+  and implement core agentic patterns (tool use, the agent loop) from scratch.
+
+------------------------------------------------------------------------
+LAB 1: 1_lab1.ipynb — First API Call & Chaining
+------------------------------------------------------------------------
+TOPIC: Introduction to LLM APIs — First call, environment setup
+WEEK/DAY: Week 1, Day 1
+
+WHAT YOU LEARN:
+  - Setting up Python environment and loading the Jupyter kernel
+  - Loading API keys from a .env file securely (dotenv)
+  - Making your first OpenAI chat completion call
+  - Chaining multiple LLM calls to create a multi-step reasoning pipeline
+  - Understanding the OpenAI message format (role/content)
+
+COURSE NOTES (verbatim):
+  "Have you completed all the setup steps in the setup folder?
+   Have you read the README? Many common questions are answered here!
+   Have you checked out the guides in the guides folder?"
+
+  "This code is a live resource - keep an eye out for my updates.
+   I push updates regularly."
+
+  "Wait, did that just output False?? If so, the most common reason is
+   that you didn't save your .env file after adding the key!"
+
+EXERCISE:
+  Chain 3 LLM calls:
+    1. Ask the LLM to pick a business area
+    2. Ask it to identify a pain-point in that business area
+    3. Ask it to propose an Agentic AI solution for the pain-point
+
+KEY CODE PATTERN:
+  from dotenv import load_dotenv
+  from openai import OpenAI
+  load_dotenv(override=True)
+  openai = OpenAI()
+  messages = [{"role": "user", "content": "What is 2+2?"}]
+  response = openai.chat.completions.create(model="gpt-4.1-nano", messages=messages)
+  print(response.choices[0].message.content)
+
+MODELS USED: gpt-4.1-nano, gpt-4.1-mini
+GUIDES REFERENCED:
+  - guides/04_technical_foundations.ipynb  (Environment Variables)
+  - guides/09_ai_apis_and_ollama.ipynb     (Using alternative AIs)
+  - guides/06_python_foundations.ipynb     (Python NameErrors)
+
+------------------------------------------------------------------------
+LAB 2: 2_lab2.ipynb — Multi-LLM Comparison + LLM-as-Judge
+------------------------------------------------------------------------
+TOPIC: Sending the same prompt to 6 different AI providers; using OpenAI
+       to judge/rank all responses as structured JSON.
+WEEK/DAY: Week 1, Day 3
+
+WHAT YOU LEARN:
+  - Connecting to OpenAI, Anthropic (Claude), Google Gemini, DeepSeek,
+    Groq, and Ollama (local LLM) from Python
+  - OpenAI-compatible endpoints (most providers accept OpenAI SDK format)
+  - LLM-as-Judge agentic pattern: use one LLM to evaluate others
+  - Parsing structured JSON output from an LLM
+  - Understanding the "reflection" agentic design pattern
+
+COURSE NOTES (verbatim):
+  "I've updated the model names to use the latest models below,
+   like GPT 5 and Claude Sonnet 4.5."
+
+  "Ollama runs a local web service that gives an OpenAI compatible endpoint,
+   and runs models locally using high performance C++ code."
+
+  "If you don't have Ollama, install it here by visiting https://ollama.com
+   then pressing Download."
+
+  "After it's installed, you should be able to visit here:
+   http://localhost:11434 and see the message 'Ollama is running'"
+
+  "The model called llama3.3 is FAR too large for home computers...
+   Stick with llama3.2 or llama3.2:1b"
+
+IMPORTANT LINKS:
+  Ollama download:  https://ollama.com
+  Ollama running:   http://localhost:11434
+  Ollama models:    https://ollama.com/models
+
+KEY CODE PATTERN:
+  from anthropic import Anthropic
+  claude = Anthropic()
+  response = claude.messages.create(model="claude-sonnet-4-5", messages=messages, max_tokens=1000)
+
+  # Google Gemini via OpenAI-compatible endpoint
+  gemini = OpenAI(api_key=google_api_key,
+                  base_url="https://generativelanguage.googleapis.com/v1beta/openai/")
+
+  # DeepSeek
+  deepseek = OpenAI(api_key=deepseek_api_key, base_url="https://api.deepseek.com/v1")
+
+  # Groq
+  groq = OpenAI(api_key=groq_api_key, base_url="https://api.groq.com/openai/v1")
+
+  # Ollama (local)
+  ollama = OpenAI(base_url='http://localhost:11434/v1', api_key='ollama')
+
+  # JSON judge output
+  results_dict = json.loads(results)
+
+MODELS USED:
+  gpt-5-nano, claude-sonnet-4-5, gemini-2.5-flash, deepseek-chat,
+  openai/gpt-oss-120b (Groq), llama3.2 (Ollama)
+LIBRARIES: openai, anthropic, json, IPython.display
+
+------------------------------------------------------------------------
+LAB 3: 3_lab3.ipynb — Personal AI Chatbot + Evaluator Pattern
+------------------------------------------------------------------------
+TOPIC: Build a personal AI assistant from your LinkedIn PDF, deploy
+       with Gradio UI, and implement LLM-as-Evaluator pattern.
+WEEK/DAY: Week 1, Day 4
+
+WHAT YOU LEARN:
+  - Reading and parsing PDF files with pypdf
+  - Building a chatbot persona from structured data
+  - Creating a Gradio chat web UI in just one line
+  - Implementing the Evaluator/Rerun pattern (quality control loop)
+  - Pydantic structured output for LLM evaluations
+  - Using Gemini as an evaluator of GPT responses
+
+COURSE NOTES (verbatim):
+  "In the folder me I've put a single file linkedin.pdf -
+   it's a PDF download of my LinkedIn profile.
+   Please replace it with yours!"
+
+  "In this lab, we're going to use the wonderful Gradio package for
+   building quick UIs, and we're also going to use the popular PyPDF
+   PDF reader. You can get guides to these packages by asking ChatGPT
+   or Claude, and you find all open-source packages on the repository
+   https://pypi.org"
+
+  "For the next cell, we will use Ollama... If you don't have Ollama,
+   install it here..."
+
+IMPORTANT LINKS:
+  PyPI: https://pypi.org
+
+KEY CODE PATTERN:
+  from pypdf import PdfReader
+  from pydantic import BaseModel
+  import gradio as gr
+
+  class Evaluation(BaseModel):
+      is_acceptable: bool
+      feedback: str
+
+  # Evaluator using Gemini with structured output
+  response = gemini.beta.chat.completions.parse(
+      model="gemini-2.5-flash", messages=messages, response_format=Evaluation)
+
+  # Gradio chat UI (one line!)
+  gr.ChatInterface(chat, type="messages").launch()
+
+MODELS USED: gpt-4o-mini, gemini-2.5-flash, (optional) llama3.2 via Ollama
+LIBRARIES: pypdf, pydantic, gradio
+
+------------------------------------------------------------------------
+LAB 4: 4_lab4.ipynb — Tool Use + Push Notifications + HuggingFace Deploy
+------------------------------------------------------------------------
+TOPIC: OpenAI function calling, agentic tool loop, Pushover mobile
+       notifications, deploying Gradio to HuggingFace Spaces.
+WEEK/DAY: Week 1, Day 5
+
+WHAT YOU LEARN:
+  - Defining tools as JSON schema for OpenAI function calling
+  - Implementing the agentic tool loop (while not done: ask LLM → call tool)
+  - Elegant tool dispatch with globals() dict (no large if-else chains)
+  - Sending real push notifications to your phone via Pushover
+  - Deploying a Gradio app to HuggingFace Spaces with `uv run gradio deploy`
+
+COURSE NOTES (verbatim):
+  "Pushover is a nifty tool for sending Push Notifications to your phone.
+   Simply visit https://pushover.net/ and click 'Login or Signup'
+   on the top right."
+
+  "Here is mine: https://huggingface.co/spaces/ed-donner/Career_Conversation"
+
+  "Visit https://huggingface.co and set up an account.
+   From the Avatar menu on the top right, choose Access Tokens...
+   give it WRITE permissions"
+
+  "From the 1_foundations folder, enter: uv run gradio deploy"
+
+  "Before you start: remember to update the files in the 'me' directory —
+   your LinkedIn profile and summary.txt — so that it talks about you!"
+
+IMPORTANT LINKS:
+  Pushover:          https://pushover.net/
+  HuggingFace:       https://huggingface.co
+  Demo space:        https://huggingface.co/spaces/ed-donner/Career_Conversation
+  Gradio deploy:     https://www.gradio.app/guides/sharing-your-app#hosting-on-hf-spaces
+
+KEY CODE PATTERN:
+  # Tool definition (JSON schema)
+  record_user_details_json = {
+      "name": "record_user_details",
+      "description": "Use this tool to record that a user is interested...",
+      "parameters": {
+          "type": "object",
+          "properties": {
+              "email": {"type": "string", "description": "..."},
+              "name":  {"type": "string", "description": "..."},
+          },
+          "required": ["email", "name"]
+      }
+  }
+  tools = [{"type": "function", "function": record_user_details_json}]
+
+  # Elegant dispatch (no if-else chain):
+  def handle_tool_calls(tool_calls):
+      for tool_call in tool_calls:
+          tool_name = tool_call.function.name
+          arguments = json.loads(tool_call.function.arguments)
+          tool = globals().get(tool_name)
+          result = tool(**arguments) if tool else {}
+
+  # The agentic loop:
+  while not done:
+      response = openai.chat.completions.create(
+          model="gpt-4o-mini", messages=messages, tools=tools)
+      if response.choices[0].finish_reason == "tool_calls":
+          messages += handle_tool_calls(response.choices[0].message.tool_calls)
+      else:
+          done = True
+
+MODELS USED: gpt-4o-mini
+LIBRARIES: openai, gradio, requests (Pushover)
+
+------------------------------------------------------------------------
+LAB 5 / EXTRA: 5_extra.ipynb — Agent Loop From First Principles
+------------------------------------------------------------------------
+TOPIC: Build a complete agent loop from scratch without any framework,
+       understanding the "Three Definitions of an Agent"
+SUBTITLE: "The Unreasonable Effectiveness of the Agent Loop"
+
+WHAT YOU LEARN:
+  - The three competing definitions of an AI agent:
+      1. AI systems that can do work independently (Sam Altman)
+      2. A system where an LLM controls the workflow (Anthropic)
+      3. An LLM that runs tools in a loop to achieve a goal
+  - Building an agent loop from scratch (no SDK, no framework)
+  - Creating custom todo-list tools
+  - Using rich library for colored/formatted terminal output
+
+COURSE NOTES (verbatim):
+  "## Three competing definitions
+   1. AI systems that can do work for you independently — Sam Altman
+   2. A system in which an LLM controls the workflow — Anthropic
+   3. An LLM agent runs tools in a loop to achieve a goal"
+
+  "Exercise: Now try to build an Agent Loop from scratch yourself!
+   Create a new .ipynb and make one from first principles, referring
+   back to this as needed. It's one of the few times that I recommend
+   typing from scratch - it's a very satisfying result."
+
+KEY CODE PATTERN:
+  from rich.console import Console
+
+  def loop(messages):
+      done = False
+      while not done:
+          response = openai.chat.completions.create(
+              model="gpt-5.2", messages=messages,
+              tools=tools, reasoning_effort="none")
+          if response.choices[0].finish_reason == "tool_calls":
+              # handle tool calls, append results
+              messages.append(...)
+          else:
+              done = True
+      return response.choices[0].message.content
+
+MODELS USED: gpt-5.2
+LIBRARIES: rich, openai
+
+================================================================================
+  PART 3: MODULE 2 — OPENAI AGENTS SDK
+  Folder: 2_openai/
+================================================================================
+
+OVERVIEW:
+  This module moves up from raw API calls to the OpenAI Agents SDK — a
+  lightweight, opinionated framework for building multi-agent systems.
+  Key concepts: agents, tools, handoffs, streaming, guardrails, tracing,
+  and running a full deep-research pipeline with web search.
+
+------------------------------------------------------------------------
+LAB 1: 1_lab1.ipynb — OpenAI Agents SDK Introduction
+------------------------------------------------------------------------
+TOPIC: Your first agent with the OpenAI Agents SDK
+WEEK/DAY: Week 2, Day 1
+
+WHAT YOU LEARN:
+  - Installing and importing openai-agents
+  - Creating agents with Agent(), setting instructions and model
+  - Running agents with Runner.run() (async)
+  - Using trace() context manager for OpenAI trace logging
+  - Viewing traces at the OpenAI platform
+
+COURSE NOTES (verbatim):
+  "The documentation on OpenAI Agents SDK is really clear and simple:
+   https://openai.github.io/openai-agents-python/
+   and it's well worth a look."
+
+  "## Now go and look at the trace:
+   https://platform.openai.com/traces"
+
+IMPORTANT LINKS:
+  SDK Docs:    https://openai.github.io/openai-agents-python/
+  Traces UI:   https://platform.openai.com/traces
+
+KEY CODE PATTERN:
+  from agents import Agent, Runner, trace
+
+  agent = Agent(
+      name="Jokester",
+      instructions="You are a joke teller",
+      model="gpt-4o-mini"
+  )
+  with trace("Telling a joke"):
+      result = await Runner.run(agent, "Tell a joke about Autonomous AI Agents")
+      print(result.final_output)
+
+MODELS USED: gpt-4o-mini
+
+------------------------------------------------------------------------
+LAB 2: 2_lab2.ipynb — Multi-Agent Workflows, Handoffs, Email
+------------------------------------------------------------------------
+TOPIC: Parallel agent runs, streaming, @function_tool decorator,
+       converting agents to tools, agent handoffs, SendGrid email.
+WEEK/DAY: Week 2, Day 2
+
+WHAT YOU LEARN:
+  - Running agents in parallel with asyncio.gather
+  - Streaming agent output with Runner.run_streamed()
+  - @function_tool decorator (replaces manual JSON schema boilerplate)
+  - Converting an Agent into a callable tool with .as_tool()
+  - Agent handoffs — one agent passing control to another
+  - Sending emails via SendGrid (optional)
+
+COURSE NOTES (verbatim):
+  "We are going to use the email provider SendGrid. But this is OPTIONAL."
+  "Please visit Sendgrid at: https://sendgrid.com/"
+
+  "If SendGrid gives you problems, see the alternative implementations
+   on Q29 of my FAQ page at https://edwarddonner.com/faq"
+
+  "Remember all that json boilerplate and the handle_tool_calls() function
+   with the if logic.. Simply wrap your function with the decorator
+   @function_tool"
+
+  "### And you can also convert an Agent into a tool"
+
+IMPORTANT LINKS:
+  SendGrid:    https://sendgrid.com
+  FAQ:         https://edwarddonner.com/faq
+  Traces:      https://platform.openai.com/traces
+
+KEY CODE PATTERN:
+  from agents import Agent, Runner, trace, function_tool
+  import asyncio
+
+  # Parallel agent runs
+  results = await asyncio.gather(
+      Runner.run(sales_agent1, message),
+      Runner.run(sales_agent2, message),
+      Runner.run(sales_agent3, message),
+  )
+
+  # @function_tool replaces JSON boilerplate:
+  @function_tool
+  def send_email(body: str):
+      """Send out an email with the given body"""
+      # sendgrid code here
+      ...
+
+  # Agent as tool:
+  tool1 = sales_agent1.as_tool(
+      tool_name="sales_agent1",
+      tool_description="Write a cold sales email"
+  )
+
+  # Handoff:
+  sales_manager = Agent(
+      name="Sales Manager",
+      tools=tools,
+      handoffs=[emailer_agent],
+      model="gpt-4o-mini"
+  )
+
+MODELS USED: gpt-4o-mini
+LIBRARIES: agents, asyncio, sendgrid
+
+------------------------------------------------------------------------
+LAB 3: 3_lab3.ipynb — Multi-Model Agents, Structured Outputs, Guardrails
+------------------------------------------------------------------------
+TOPIC: Running non-OpenAI models (DeepSeek, Gemini, Groq) inside the
+       Agents SDK, Pydantic structured outputs, input guardrails.
+WEEK/DAY: Week 2, Day 3
+
+WHAT YOU LEARN:
+  - Using OpenAIChatCompletionsModel wrapper to plug in any LLM
+  - Using DeepSeek, Gemini, and Groq as agents
+  - Pydantic models as structured agent output types
+  - @input_guardrail decorator to validate/block inputs
+  - GuardrailFunctionOutput with tripwire_triggered flag
+
+KEY CODE PATTERN:
+  from agents import OpenAIChatCompletionsModel, input_guardrail, GuardrailFunctionOutput
+  from openai import AsyncOpenAI
+  from pydantic import BaseModel
+
+  deepseek_client = AsyncOpenAI(base_url="https://api.deepseek.com/v1",
+                                 api_key=deepseek_api_key)
+  deepseek_model = OpenAIChatCompletionsModel(
+      model="deepseek-chat",
+      openai_client=deepseek_client)
+  sales_agent1 = Agent(name="DeepSeek Sales Agent",
+                        instructions=instructions1,
+                        model=deepseek_model)
+
+  class NameCheckOutput(BaseModel):
+      is_name_in_message: bool
+      name: str
+
+  @input_guardrail
+  async def guardrail_against_name(ctx, agent, message):
+      result = await Runner.run(guardrail_agent, message, context=ctx.context)
+      return GuardrailFunctionOutput(
+          tripwire_triggered=result.final_output.is_name_in_message
+      )
+
+IMPORTANT LINKS:
+  Traces: https://platform.openai.com/traces
+
+------------------------------------------------------------------------
+LAB 4: 4_lab4.ipynb — Deep Research Agent
+------------------------------------------------------------------------
+TOPIC: Build a complete deep-research pipeline using WebSearchTool,
+       structured outputs, and multi-agent orchestration.
+WEEK/DAY: Week 2, Day 4
+
+WHAT YOU LEARN:
+  - Using WebSearchTool (OpenAI-hosted search — not free)
+  - Understanding other hosted tools: FileSearchTool, ComputerTool
+  - Multi-step research pipeline: plan → search → write → email
+  - ModelSettings with tool_choice="required"
+  - Pydantic structured plan and report types
+
+COURSE NOTES (verbatim):
+  "OpenAI Agents SDK includes the following hosted tools:
+   The WebSearchTool lets an agent search the web.
+   The FileSearchTool allows retrieving information from OpenAI Vector Stores.
+   The ComputerTool allows automating computer use tasks."
+
+  "This is costing me 2.5 cents per call for OpenAI WebSearchTool...
+   Costs are here: https://platform.openai.com/docs/pricing#web-search"
+
+IMPORTANT LINKS:
+  WebSearch pricing: https://platform.openai.com/docs/pricing#web-search
+  Traces:            https://platform.openai.com/traces
+
+KEY CODE PATTERN:
+  from agents import Agent, WebSearchTool, trace, Runner, gen_trace_id
+  from agents.model_settings import ModelSettings
+  from pydantic import BaseModel, Field
+
+  search_agent = Agent(
+      name="Search agent",
+      tools=[WebSearchTool(search_context_size="low")],
+      model="gpt-4o-mini",
+      model_settings=ModelSettings(tool_choice="required"),
+  )
+
+  class WebSearchItem(BaseModel):
+      reason: str = Field(description="Why this search query is needed")
+      query: str = Field(description="The search query")
+
+  class WebSearchPlan(BaseModel):
+      searches: list[WebSearchItem]
+
+  planner_agent = Agent(name="PlannerAgent",
+                         model="gpt-4o-mini",
+                         output_type=WebSearchPlan)
+  writer_agent  = Agent(name="WriterAgent",
+                         model="gpt-4o-mini",
+                         output_type=ReportData)
+
+MODELS USED: gpt-4o-mini
+
+EXTRA FILES:
+  2_openai/deep_research/  — Extended deep research implementation
+
+================================================================================
+  PART 4: MODULE 3 — CREWAI
+  Folder: 3_crew/
+================================================================================
+
+OVERVIEW:
+  CrewAI is a YAML-driven, opinionated multi-agent framework. Agents and
+  tasks are defined declaratively in YAML files; the Python code uses
+  decorators to wire them together. The course builds several real projects.
+
+INSTALLATION NOTE:
+  crewai==0.130.0 is installed as a uv tool (separate environment):
+  $ uv tool install crewai==0.130.0 --python 3.12
+  Windows users need Microsoft Build Tools installed first.
+
+PROJECT STRUCTURE (crewai create crew generates this):
+  src/<project_name>/
+    crew.py              — @CrewBase class with @agent, @task, @crew methods
+    config/
+      agents.yaml        — Declarative agent definitions
+      tasks.yaml         — Declarative task definitions
+  pyproject.toml
+  .env
+
+DIRECTORY OVERVIEW:
+  3_crew/
+    financial_researcher/  — Main demo: research a company
+    stock_picker/          — Pick stocks based on research
+    debate/                — Two-agent debate on a topic
+    engineering_team/      — Software engineering team simulation
+    coder/                 — Code generation with crew
+    community_contributions/
+
+------------------------------------------------------------------------
+financial_researcher — Main Demo Project
+------------------------------------------------------------------------
+TOPIC: Multi-agent financial research with CrewAI
+FRAMEWORK: CrewAI
+
+WHAT YOU LEARN:
+  - Running: crewai create crew → generates scaffold
+  - Defining agents in agents.yaml (role, goal, backstory, llm)
+  - Defining tasks in tasks.yaml (description, expected_output, agent)
+  - @CrewBase, @agent, @task, @crew Python decorators
+  - Sequential crew execution: Process.sequential
+  - SerperDevTool for web search within agents
+  - Output to file (output_file='output/report.md')
+
+IMPORTANT LINKS:
+  CrewAI Docs:    https://docs.crewai.com
+  GitHub:         https://github.com/joaomdmoura/crewai
+  Discord:        https://discord.com/invite/X4JWnZnxPb
+
+AGENTS.YAML EXAMPLE:
+  researcher:
+    role: Senior Financial Researcher for {company}
+    goal: Research the company, news and potential for {company}
+    backstory: You're a seasoned financial researcher...
+    llm: openai/gpt-4o-mini
+
+  analyst:
+    role: Market Analyst and Report writer focused on {company}
+    goal: Analyze company {company} and create a comprehensive report
+    backstory: You're a meticulous, skilled analyst...
+    llm: openai/gpt-4o-mini
+
+KEY CODE PATTERN (crew.py):
+  from crewai import Agent, Crew, Process, Task
+  from crewai.project import CrewBase, agent, crew, task
+  from crewai_tools import SerperDevTool
+
+  @CrewBase
+  class ResearchCrew():
+      agents_config = 'config/agents.yaml'
+      tasks_config  = 'config/tasks.yaml'
+
+      @agent
+      def researcher(self) -> Agent:
+          return Agent(config=self.agents_config['researcher'],
+                       tools=[SerperDevTool()])
+
+      @agent
+      def analyst(self) -> Agent:
+          return Agent(config=self.agents_config['analyst'])
+
+      @task
+      def research_task(self) -> Task:
+          return Task(config=self.tasks_config['research_task'])
+
+      @task
+      def analysis_task(self) -> Task:
+          return Task(config=self.tasks_config['analysis_task'],
+                      output_file='output/report.md')
+
+      @crew
+      def crew(self) -> Crew:
+          return Crew(agents=self.agents,
+                      tasks=self.tasks,
+                      process=Process.sequential)
+
+RUN COMMAND:
+  $ crewai run
+
+OUTPUT: output/report.md
+
+================================================================================
+  PART 5: MODULE 4 — LANGGRAPH
+  Folder: 4_langgraph/
+================================================================================
+
+OVERVIEW:
+  LangGraph models agent workflows as graphs. You define States, Nodes
+  (functions), and Edges (transitions). It supports memory/checkpointing,
+  conditional routing, and is pure Python — no LLM required to understand
+  the fundamentals.
+
+------------------------------------------------------------------------
+LAB 1: 1_lab1.ipynb — LangGraph Fundamentals
+------------------------------------------------------------------------
+TOPIC: State → Nodes → Edges → Compile — the 5-step graph pattern.
+WEEK/DAY: Week 4, Day 2
+
+WHAT YOU LEARN:
+  - The 5-step LangGraph construction pattern:
+      1. Define State (data schema)
+      2. Create StateGraph builder
+      3. Add Nodes (Python functions)
+      4. Add Edges (transitions between nodes)
+      5. Compile to runnable graph
+  - Annotated type hints and reducer functions
+  - add_messages reducer (handles message list updates automatically)
+  - StateGraph, START, END constants
+  - Visualizing graph with Mermaid diagram
+  - Gradio UI connected to LangGraph
+
+COURSE NOTES (verbatim):
+  "LangGraph is all about python functions -
+   it doesn't need to involve LLMs!!"
+
+  "### A word about 'Annotated'
+   LangGraph needs us to use this feature when we define our State object.
+   It wants us to tell it what function it should call to update the State
+   with a new value. This function is called a reducer.
+   LangGraph provides a default reducer called add_messages which takes
+   care of the most common case."
+
+KEY CODE PATTERN:
+  from langgraph.graph import StateGraph, START, END
+  from langgraph.graph.message import add_messages
+  from langchain_openai import ChatOpenAI
+  from pydantic import BaseModel
+  from typing import Annotated
+
+  class State(BaseModel):
+      messages: Annotated[list, add_messages]
+
+  graph_builder = StateGraph(State)
+  llm = ChatOpenAI(model="gpt-4o-mini")
+
+  def chatbot_node(old_state: State) -> State:
+      response = llm.invoke(old_state.messages)
+      return State(messages=[response])
+
+  graph_builder.add_node("chatbot", chatbot_node)
+  graph_builder.add_edge(START, "chatbot")
+  graph_builder.add_edge("chatbot", END)
+  graph = graph_builder.compile()
+
+  # Visualize:
+  display(Image(graph.get_graph().draw_mermaid_png()))
+
+MODELS USED: gpt-4o-mini (via ChatOpenAI)
+LIBRARIES: langgraph, langchain-openai, pydantic, gradio, IPython
+
+------------------------------------------------------------------------
+LAB 2: 2_lab2.ipynb — Tools, Memory Checkpointing
+------------------------------------------------------------------------
+TOPIC: Adding tools to LangGraph, persistent memory with MemorySaver
+       and SQLite, time-travel/state history.
+WEEK/DAY: Week 4, Day 3
+
+WHAT YOU LEARN:
+  - Setting up LangSmith for trace monitoring
+  - GoogleSerperAPIWrapper as a search tool
+  - ToolNode and tools_condition for conditional edges
+  - MemorySaver (in-memory) checkpointing
+  - SqliteSaver (disk-persistent) checkpointing
+  - thread_id configuration for multi-turn conversations
+  - Super-steps and reducers explained
+  - State history and time-travel (rewind graph to earlier state)
+
+COURSE NOTES (verbatim):
+  "### First, let's go set up LangSmith! https://langsmith.com"
+
+  "### This is a crucial point for understanding LangGraph
+   A super-step can be considered a single iteration over the graph nodes.
+   The reducer handles state updates automatically within one super-step,
+   but not between them. That is what checkpointing achieves."
+
+  "LangGraph gives you tools to set the state back to a prior point in
+   time, to branch off:"
+
+IMPORTANT LINKS:
+  LangSmith: https://langsmith.com
+
+KEY CODE PATTERN:
+  from langchain_community.utilities import GoogleSerperAPIWrapper
+  from langchain.agents import Tool
+  from langgraph.prebuilt import ToolNode, tools_condition
+  from langgraph.checkpoint.memory import MemorySaver
+  from langgraph.checkpoint.sqlite import SqliteSaver
+  import sqlite3
+
+  serper = GoogleSerperAPIWrapper()
+  tool_search = Tool(name="search", func=serper.run, description="Search the web")
+  llm_with_tools = llm.bind_tools(tools)
+
+  # Conditional edges with ToolNode:
+  graph_builder.add_conditional_edges("chatbot", tools_condition, "tools")
+  graph_builder.add_edge("tools", "chatbot")
+
+  # In-memory checkpointing:
+  memory = MemorySaver()
+  graph = graph_builder.compile(checkpointer=memory)
+  config = {"configurable": {"thread_id": "1"}}
+
+  # Persistent SQLite checkpointing:
+  conn = sqlite3.connect("memory.db", check_same_thread=False)
+  sql_memory = SqliteSaver(conn)
+
+MODELS USED: gpt-4o-mini
+
+------------------------------------------------------------------------
+LAB 3: 3_lab3.ipynb — Playwright Browser + Async LangGraph
+------------------------------------------------------------------------
+TOPIC: Add real web browsing capability to a LangGraph agent using
+       Playwright, running async graphs in notebooks.
+WEEK/DAY: Week 4, Day 4
+
+WHAT YOU LEARN:
+  - PlayWrightBrowserToolkit from LangChain community
+  - Creating an async Playwright browser
+  - await graph.ainvoke() for async graph execution
+  - nest_asyncio for running async code in Jupyter notebooks
+  - Windows compatibility issues with Playwright in notebooks
+  - Building a browser-enabled conversational assistant
+
+COURSE NOTES (verbatim):
+  "### Extra installation step — if you don't have Node and Playwright:
+   Please see instructions here: setup/SETUP-node.md"
+
+  "While executing the next few cells, you might hit a problem with the
+   Playwright browser raising a NotImplementedError. This should work
+   when we move to python modules, but it can cause problems on Windows
+   in a notebook."
+
+KEY CODE PATTERN:
+  from langchain_community.agent_toolkits import PlayWrightBrowserToolkit
+  from langchain_community.tools.playwright.utils import create_async_playwright_browser
+  import nest_asyncio
+  nest_asyncio.apply()
+
+  async_browser = create_async_playwright_browser(headless=False)
+  toolkit = PlayWrightBrowserToolkit.from_browser(async_browser=async_browser)
+  tools = toolkit.get_tools()
+
+  async def chat(user_input: str, history):
+      result = await graph.ainvoke(
+          {"messages": [{"role": "user", "content": user_input}]},
+          config=config)
+      return result["messages"][-1].content
+
+STANDALONE APP: 4_langgraph/sidekick.py + sidekick_tools.py
+
+------------------------------------------------------------------------
+LAB 4: 4_lab4.ipynb — The Sidekick (Multi-Agent + Evaluator)
+------------------------------------------------------------------------
+TOPIC: Full Sidekick multi-agent system with structured evaluation,
+       conditional graph routing, and Gradio Blocks UI.
+WEEK/DAY: Week 4, Day 5
+
+WHAT YOU LEARN:
+  - EvaluatorOutput Pydantic model for structured evaluation
+  - with_structured_output() for constraining LLM responses
+  - Multi-node graph: Worker → Tools → Evaluator → (back to Worker or END)
+  - TypedDict for State definition with Optional fields
+  - Conditional routing with custom router functions
+  - Gradio with gr.Blocks() for multi-component UI
+
+COURSE NOTES (verbatim):
+  "# The Sidekick
+   1. Structured Outputs
+   2. A multi-agent flow"
+
+  "Asynchronous LangGraph
+   Sync: graph.invoke(state)
+   Async: await graph.ainvoke(state)"
+
+KEY CODE PATTERN:
+  from typing import TypedDict, Annotated, Optional, List, Any
+  from pydantic import BaseModel, Field
+
+  class EvaluatorOutput(BaseModel):
+      feedback: str = Field(description="Detailed feedback on the work")
+      success_criteria_met: bool
+      user_input_needed: bool
+
+  class State(TypedDict):
+      messages: Annotated[List[Any], add_messages]
+      success_criteria: str
+      feedback_on_work: Optional[str]
+      success_criteria_met: bool
+      user_input_needed: bool
+
+  evaluator_llm_with_output = evaluator_llm.with_structured_output(EvaluatorOutput)
+
+  def worker_router(state: State) -> str:
+      if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+          return "tools"
+      return "evaluator"
+
+  def route_based_on_evaluation(state: State) -> str:
+      if state["success_criteria_met"] or state["user_input_needed"]:
+          return "END"
+      return "worker"
+
+MODELS USED: gpt-4o-mini
+STANDALONE APP: 4_langgraph/sidekick.py (full Gradio app)
+
+================================================================================
+  PART 6: MODULE 5 — AUTOGEN
+  Folder: 5_autogen/
+================================================================================
+
+OVERVIEW:
+  AutoGen is Microsoft's multi-agent framework with two layers:
+  AgentChat (high-level, easy) and Core (low-level, flexible).
+  The course covers both layers plus distributed gRPC runtimes.
+
+------------------------------------------------------------------------
+LAB 1: 1_lab1_autogen_agentchat.ipynb — AutoGen AgentChat Intro
+------------------------------------------------------------------------
+TOPIC: First AutoGen agent with AgentChat layer
+WEEK/DAY: Week 5, Day 1
+
+WHAT YOU LEARN:
+  - OpenAIChatCompletionClient and OllamaChatCompletionClient
+  - AssistantAgent — the main AgentChat agent class
+  - TextMessage — message format for AgentChat
+  - on_messages() + CancellationToken async pattern
+  - reflect_on_tool_use=True — agent reflects on tool results
+  - SQLite for storing domain data (airline prices example)
+
+COURSE NOTES (verbatim):
+  "AutoGen AgentChat!
+   This should look simple and familiar, because it has a lot in common
+   with Crew and OpenAI Agents SDK"
+
+KEY CODE PATTERN:
+  from autogen_ext.models.openai import OpenAIChatCompletionClient
+  from autogen_agentchat.agents import AssistantAgent
+  from autogen_agentchat.messages import TextMessage
+  from autogen_core import CancellationToken
+
+  model_client = OpenAIChatCompletionClient(model="gpt-4o-mini")
+  agent = AssistantAgent(
+      name="smart_airline_agent",
+      model_client=model_client,
+      tools=[get_city_price],
+      reflect_on_tool_use=True
+  )
+  response = await agent.on_messages(
+      [TextMessage(content="What is the price to Paris?", source="user")],
+      cancellation_token=CancellationToken()
+  )
+
+MODELS USED: gpt-4o-mini (also Ollama support)
+
+------------------------------------------------------------------------
+LAB 2: 2_lab2_autogen_agentchat.ipynb — Multi-Modal, Teams, MCP Preview
+------------------------------------------------------------------------
+TOPIC: Multi-modal inputs, structured outputs, LangChain tools in AutoGen,
+       team orchestration, first look at MCP from AutoGen.
+WEEK/DAY: Week 5, Day 2
+
+WHAT YOU LEARN:
+  - MultiModalMessage with images
+  - output_content_type for Pydantic structured outputs in AutoGen
+  - LangChainToolAdapter — use any LangChain tool from AutoGen agent
+  - FileManagementToolkit — file system operations as tools
+  - RoundRobinGroupChat — team orchestration
+  - TextMentionTermination — stop condition for teams
+  - StdioServerParams + mcp_server_tools — first MCP integration preview
+
+COURSE NOTES (verbatim):
+  "## Drumroll..
+   ## Introducing MCP!
+   Our first look at the Model Context Protocol from Anthropic —
+   AutoGen makes it easy to use MCP tools, just like LangChain tools."
+
+  "**But wait — a not-so-small problem for Windows PC people**
+   There's a problem running MCP Servers on Windows PCs; Mac/Linux is fine.
+   The workaround is... WSL.
+   The WSL Setup instructions are in setup/SETUP-WSL.md"
+
+IMPORTANT LINKS:
+  ChatGPT share: https://chatgpt.com/share/6817bbc3-3d0c-8012-9b51-631842470628
+  WSL Setup:     setup/SETUP-WSL.md
+
+KEY CODE PATTERN:
+  from autogen_ext.tools.langchain import LangChainToolAdapter
+  from autogen_agentchat.conditions import TextMentionTermination
+  from autogen_agentchat.teams import RoundRobinGroupChat
+  from autogen_ext.tools.mcp import StdioServerParams, mcp_server_tools
+
+  autogen_serper = LangChainToolAdapter(langchain_serper)
+
+  team = RoundRobinGroupChat(
+      [primary_agent, evaluation_agent],
+      termination_condition=text_termination,
+      max_turns=20
+  )
+
+  # MCP via AutoGen (first look):
+  fetch_mcp_server = StdioServerParams(command="uvx", args=["mcp-server-fetch"])
+  fetcher_tools = await mcp_server_tools(fetch_mcp_server)
+  agent = AssistantAgent(name="fetcher", model_client=model_client, tools=fetcher_tools)
+
+------------------------------------------------------------------------
+LAB 3: 3_lab3_autogen_core.ipynb — AutoGen Core (Standalone Runtime)
+------------------------------------------------------------------------
+TOPIC: The lower-level AutoGen Core layer — standalone runtime,
+       agent composition with message routing.
+WEEK/DAY: Week 5, Day 3
+
+WHAT YOU LEARN:
+  - RoutedAgent and @message_handler decorator
+  - SingleThreadedAgentRuntime — standalone (non-distributed) runtime
+  - AgentId — type + key pair identity for agents
+  - Agent-to-agent message passing
+  - Decoupling agent logic from message delivery (the core principle)
+  - Rock, Paper, Scissors multi-agent game with GPT vs Ollama
+
+COURSE NOTES (verbatim):
+  "### The fundamental principle
+   AutoGen Core decouples an agent's logic from how messages are delivered.
+   The communication infrastructure is called a Runtime.
+   There are 2 types: Standalone and Distributed.
+   Today we will use a standalone runtime:
+   the SingleThreadedAgentRuntime."
+
+KEY CODE PATTERN:
+  from autogen_core import AgentId, MessageContext, RoutedAgent, message_handler
+  from autogen_core import SingleThreadedAgentRuntime
+  from dataclasses import dataclass
+
+  @dataclass
+  class Message:
+      content: str
+
+  class SimpleAgent(RoutedAgent):
+      def __init__(self):
+          super().__init__("Simple Agent")
+
+      @message_handler
+      async def on_my_message(self, message: Message, ctx: MessageContext) -> Message:
+          return Message(content=f"I disagree with: {message.content}")
+
+  runtime = SingleThreadedAgentRuntime()
+  await SimpleAgent.register(runtime, "simple_agent", lambda: SimpleAgent())
+  runtime.start()
+  response = await runtime.send_message(
+      Message("hello"), AgentId("simple_agent", "default"))
+
+STANDALONE MODULES: 5_autogen/agent.py, world.py, messages.py, creator.py
+
+------------------------------------------------------------------------
+LAB 4: 4_lab4_autogen_distributed.ipynb — Distributed AutoGen (gRPC)
+------------------------------------------------------------------------
+TOPIC: AutoGen distributed runtime — multiple agents in separate
+       processes communicating over gRPC.
+WEEK/DAY: Week 5, Day 4
+
+WHAT YOU LEARN:
+  - GrpcWorkerAgentRuntimeHost — hosts gRPC server
+  - GrpcWorkerAgentRuntime — worker that connects to host
+  - Running agents in separate processes via gRPC
+  - Pros/Cons debate between distributed agents
+  - Understanding production distributed agent architectures
+
+COURSE NOTES (verbatim):
+  "I'm only going to give a Teaser of this!! Partly because I'm unsure
+   how relevant it is to you. If you'd like me to add more content for
+   this, please do let me know.."
+
+KEY CODE PATTERN:
+  from autogen_ext.runtimes.grpc import GrpcWorkerAgentRuntimeHost, GrpcWorkerAgentRuntime
+
+  # Host (message broker):
+  host = GrpcWorkerAgentRuntimeHost(address="localhost:50051")
+  host.start()
+
+  # Worker 1:
+  worker1 = GrpcWorkerAgentRuntime(host_address="localhost:50051")
+  await worker1.start()
+  await Player1Agent.register(worker1, "player1", lambda: Player1Agent("player1"))
+
+  # Send message:
+  response = await runtime.send_message(
+      Message(content="Go! Start the debate."), agent_id)
+
+MODELS USED: gpt-4o-mini
+
+================================================================================
+  PART 7: MODULE 6 — MCP: MODEL CONTEXT PROTOCOL
+  Folder: 6_mcp/
+================================================================================
+
+OVERVIEW:
+  The grand finale. MCP (Model Context Protocol by Anthropic) is a standard
+  for connecting AI agents to external tools and data sources. This module
+  goes from using pre-built MCP servers to writing your own, and culminates
+  in an autonomous 4-trader investment simulation with 44+ MCP tools.
+
+  WELCOME MESSAGE from the notebook:
+  "## WELCOME TO WEEK 6  
+   The Epic Finale Week  
+   # WELCOME TO THE MODEL CONTEXT PROTOCOL!"
+
+------------------------------------------------------------------------
+LAB 1: 1_lab1.ipynb — Using Existing MCP Servers
+------------------------------------------------------------------------
+TOPIC: Connect to pre-built MCP servers (fetch, Playwright, filesystem)
+WEEK/DAY: Week 6, Day 1
+
+WHAT YOU LEARN:
+  - MCPServerStdio context manager to spawn MCP servers
+  - list_tools() to inspect what a server provides
+  - Python MCP servers via uvx (fetch, memory, market)
+  - JavaScript MCP servers via npx (Playwright, filesystem)
+  - Combining multiple MCP servers with one Agent
+  - Important note about a breaking change in OpenAI Agents SDK
+
+COURSE NOTES (verbatim):
+  "1. Create a Client
+   2. Have it spawn a server
+   3. Collect the tools that the server can use"
+
+  "### Now take a look at some MCP marketplaces
+   https://mcp.so
+   https://glama.ai/mcp
+   https://smithery.ai/
+   https://huggingface.co/blog/LLMhacker/top-11-essential-mcp-libraries"
+
+IMPORTANT LINKS (MCP servers / marketplaces):
+  https://mcp.so
+  https://glama.ai/mcp
+  https://smithery.ai/
+  https://huggingface.co/blog/LLMhacker/top-11-essential-mcp-libraries
+  https://huggingface.co/blog/Kseniase/mcp
+  setup/SETUP-node.md  (Node.js required for npx-based MCP servers)
+  setup/SETUP-WSL.md   (Windows Subsystem for Linux for MCP on Windows)
+
+KEY CODE PATTERN:
+  from agents import Agent, Runner, trace
+  from agents.mcp import MCPServerStdio
+
+  # Fetch MCP server (Python, via uvx)
+  fetch_params = {"command": "uvx", "args": ["mcp-server-fetch"]}
+  async with MCPServerStdio(params=fetch_params,
+                             client_session_timeout_seconds=60) as server:
+      fetch_tools = await server.list_tools()
+
+  # Playwright MCP server (JS, via npx)
+  playwright_params = {"command": "npx", "args": ["@playwright/mcp@latest"]}
+
+  # Filesystem MCP server (JS, via npx)
+  files_params = {"command": "npx",
+                  "args": ["-y", "@modelcontextprotocol/server-filesystem", sandbox_path]}
+
+  # Agent with multiple MCP servers:
+  async with MCPServerStdio(params=files_params) as mcp_files:
+      async with MCPServerStdio(params=playwright_params) as mcp_browser:
+          agent = Agent(name="investigator",
+                        model="gpt-4.1-mini",
+                        mcp_servers=[mcp_files, mcp_browser])
+          result = await Runner.run(agent, "Find a recipe for Banoffee Pie...")
+
+------------------------------------------------------------------------
+LAB 2: 2_lab2.ipynb — Writing Your Own MCP Server and Client
+------------------------------------------------------------------------
+TOPIC: Build a custom MCP server and client from scratch
+WEEK/DAY: Week 6, Day 2
+
+WHAT YOU LEARN:
+  - Creating a custom MCP server (accounts_server.py)
+  - Exposing Python functions as MCP tools
+  - Exposing data as MCP resources
+  - Creating a custom MCP client (accounts_client.py)
+  - get_accounts_tools_openai() — get native OpenAI tools from MCP
+  - Reading MCP resources programmatically (read_accounts_resource)
+  - Two modes: MCP-native Agent vs native tool list
+
+COURSE NOTES (verbatim):
+  "We're about to create and use our own MCP Server and MCP Client!
+   It's pretty simple, but it's not super-simple."
+
+  "Exercise: Make your own MCP Server! Make a simple function to return
+   the current Date, and expose it as a tool so that an Agent can tell
+   you today's date."
+
+KEY CODE PATTERN:
+  from accounts_client import get_accounts_tools_openai, read_accounts_resource
+
+  params = {"command": "uv", "args": ["run", "accounts_server.py"]}
+
+  # Mode 1: Agent with MCP server
+  async with MCPServerStdio(params=params) as mcp_server:
+      agent = Agent(name="account_manager",
+                    instructions=instructions,
+                    model=model,
+                    mcp_servers=[mcp_server])
+      result = await Runner.run(agent, request)
+
+  # Mode 2: Native OpenAI tools from MCP
+  openai_tools = await get_accounts_tools_openai()
+  agent = Agent(name="account_manager", tools=openai_tools)
+  context = await read_accounts_resource("ed")
+
+------------------------------------------------------------------------
+LAB 3: 3_lab3.ipynb — MCP Ecosystem: Memory, Search, Polygon.io
+------------------------------------------------------------------------
+TOPIC: Real-world MCP servers — persistent memory, Brave web search,
+       and financial market data with Polygon.io.
+WEEK/DAY: Week 6, Day 3
+
+WHAT YOU LEARN:
+  - 3 types of MCP servers:
+      Type 1 — Runs locally, data stays local (knowledge graph memory)
+      Type 2 — Runs locally, calls a web service (Brave Search, Polygon)
+      Type 3 — Runs remotely (hosted MCP servers)
+  - mcp-memory-libsql — persistent knowledge graph memory (local DB)
+  - Brave Search MCP server (needs BRAVE_API_KEY)
+  - Polygon.io financial data MCP (free and paid tiers)
+  - Custom market_server.py for financial data
+
+COURSE NOTES (verbatim):
+  "### The first type of MCP Server: runs locally, everything local
+   Here's a really interesting one: a knowledge-graph based memory.
+   https://github.com/modelcontextprotocol/servers/tree/main/src/memory"
+
+  "### Brave Search — https://brave.com/search/api/
+   Set up your account and put your key in the .env under BRAVE_API_KEY"
+
+  "## And now the third type: running remotely
+   It's actually really hard to find a 'remote MCP server'...
+   Anthropic lists some:
+   https://docs.anthropic.com/en/docs/agents-and-tools/remote-mcp-servers
+   CloudFlare has tooling:
+   https://developers.cloudflare.com/agents/guides/remote-mcp-server/"
+
+  "## NEW SECTION: Introducing polygon.io
+   Polygon.io is a hugely popular financial data provider.
+   https://polygon.io"
+
+IMPORTANT LINKS:
+  Knowledge graph memory: https://github.com/modelcontextprotocol/servers/tree/main/src/memory
+  Brave Search API:       https://brave.com/search/api/
+  Anthropic remote MCP:  https://docs.anthropic.com/en/docs/agents-and-tools/remote-mcp-servers
+  CloudFlare MCP:        https://developers.cloudflare.com/agents/guides/remote-mcp-server/
+  Polygon.io:            https://polygon.io
+
+KEY CODE PATTERN:
+  # Type 1: Local knowledge graph memory
+  params = {
+      "command": "npx",
+      "args": ["-y", "mcp-memory-libsql"],
+      "env": {"LIBSQL_URL": "file:./memory/ed.db"}
+  }
+
+  # Type 2: Brave Search
+  env = {"BRAVE_API_KEY": os.getenv("BRAVE_API_KEY")}
+  params = {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": env
+  }
+
+  # Polygon.io paid MCP server:
+  params = {
+      "command": "uvx",
+      "args": ["--from",
+               "git+https://github.com/polygon-io/mcp_polygon@v0.1.0", "mcp_polygon"],
+      "env": {"POLYGON_API_KEY": polygon_api_key}
+  }
+
+  # Custom market server:
+  params = {"command": "uv", "args": ["run", "market_server.py"]}
+
+------------------------------------------------------------------------
+LAB 4: 4_lab4.ipynb — Capstone Intro: Single Trader Agent
+------------------------------------------------------------------------
+TOPIC: Build one autonomous Trader agent combining multiple MCP servers
+       (accounts + fetch + memory + search + market)
+WEEK/DAY: Week 6, Day 4
+
+WHAT YOU LEARN:
+  - AsyncExitStack to manage multiple async context managers cleanly
+  - Researcher Agent as a sub-agent tool for the Trader Agent
+  - Accounts MCP server for portfolio management
+  - Combining 5+ MCP servers for one agent
+  - Reading strategy resources from MCP
+
+COURSE NOTES (verbatim):
+  "# Autonomous Traders
+   An equity trading simulation, with 4 Traders and a Researcher,
+   powered by a slew of MCP servers with tools & resources:
+   1. Our home-made Accounts MCP server
+   2. Fetch
+   3. Memory
+   4. Brave Search
+   5. Financial data"
+
+  "**PLEASE READ!!** Please do not use this for actual trading decisions!!"
+
+  "I've done something a bit fancy with code like this:
+   async with AsyncExitStack() as stack:
+       mcp_servers = [await stack.enter_async_context(MCPServerStdio(params))
+                      for params in mcp_server_params]"
+
+KEY CODE PATTERN:
+  from contextlib import AsyncExitStack
+  from accounts_client import read_accounts_resource, read_strategy_resource
+
+  # Researcher as a callable tool for the trader
+  researcher = Agent(name="Researcher",
+                     model="gpt-4.1-mini",
+                     mcp_servers=researcher_mcp_servers)
+  researcher_tool = researcher.as_tool(
+      tool_name="Researcher",
+      tool_description="Use me to research a company or market situation"
+  )
+
+  # Trader Agent
+  trader = Agent(
+      name="Ed",
+      instructions=instructions,
+      tools=[researcher_tool],
+      mcp_servers=trader_mcp_servers,    # accounts, push, market
+      model="gpt-4o-mini",
+  )
+
+  # Clean management of multiple MCP contexts:
+  async with AsyncExitStack() as stack:
+      mcp_servers = [
+          await stack.enter_async_context(MCPServerStdio(params))
+          for params in mcp_server_params
+      ]
+  result = await Runner.run(trader, prompt, max_turns=30)
+
+------------------------------------------------------------------------
+LAB 5: 5_lab5.ipynb — GRAND FINALE: Autonomous Trading Floor
+------------------------------------------------------------------------
+TOPIC: 4 autonomous traders running concurrently with 44 MCP tools,
+       custom tracing, Gradio UI, and infinite trading loop.
+WEEK/DAY: Week 6, Day 5
+
+WHAT YOU LEARN:
+  - Running 4 agents concurrently with asyncio.gather
+  - Custom OpenAI tracer (tracers.py) to monitor agent activity
+  - Infinite trading loop with configurable interval (trading_floor.py)
+  - Gradio Blocks UI showing live trader activity (app.py)
+  - Environment variable controls for production behavior
+  - Multi-model support (DeepSeek, Gemini, Groq via OpenRouter)
+  - Monitoring API usage and cost control
+
+THE FOUR TRADERS:
+  "Warren" — modeled after Warren Buffett (value investing)
+  "George"  — modeled after George Soros (macro/momentum)
+  "Ray"     — modeled after Ray Dalio (all-weather/risk parity)
+  "Cathie"  — modeled after Cathie Wood (disruptive innovation)
+  + "Researcher" sub-agent for each trader
+
+COURSE NOTES (verbatim):
+  "## Introducing our FOUR traders
+   Warren, in homage to Warren Buffett
+   George, in homage to George Soros
+   Ray, in homage to Ray Dalio
+   Cathie, in homage to Cathie Wood"
+
+  "while True:
+       await asyncio.gather(*[trader.run() for trader in traders])
+       await asyncio.sleep(RUN_EVERY_N_MINUTES * 60)"
+
+  "**One last reminder to monitor your APIs**
+   This will run on a loop, every hour, or however you specified.
+   You should watch your API usage, and stop this running when
+   you've had enough!"
+
+  "THANK YOU SO SO MUCH! You've reached the conclusion!"
+
+ENVIRONMENT VARIABLES:
+  RUN_EVERY_N_MINUTES=60           — how often traders run
+  RUN_EVEN_WHEN_MARKET_IS_CLOSED   — run overnight/weekends?
+  USE_MANY_MODELS=False            — use multiple LLM providers?
+  POLYGON_PLAN=paid or realtime    — Polygon.io data tier
+
+KEY FILES:
+  mcp_params.py        — All MCP server parameter configurations
+  templates.py         — System prompts and user prompt templates
+  traders.py           — Trader class definition
+  trading_floor.py     — Main async loop
+  app.py               — Gradio dashboard UI
+  tracers.py           — Custom OpenAI tracing
+  accounts.py          — Account data model
+  accounts_server.py   — MCP server for accounts
+  accounts_client.py   — MCP client for accounts
+  market.py            — Polygon.io data model
+  market_server.py     — MCP server for market data
+  push_server.py       — Pushover push notification MCP server
+  database.py          — SQLite database layer
+  reset.py             — Reset traders to initial state
+
+RUN COMMANDS:
+  cd 6_mcp
+  uv run app.py             # Launch Gradio dashboard
+  uv run trading_floor.py   # Start autonomous traders
+
+TOTAL MCP TOOLS: ~44 tools across all servers
+
+================================================================================
+  PART 8: SUMMARY TABLE
+================================================================================
+
+  WEEK  MODULE          FRAMEWORK           KEY TOPICS
+  ----  ------          ---------           ----------
+  1     1_foundations   Raw APIs            API calls, multi-LLM, LLM-as-Judge,
+                                            Gradio, PDF, tool calling, agent loop,
+                                            push notifications, HuggingFace deploy
+  2     2_openai        OpenAI Agents SDK   Agents, @function_tool, as_tool(),
+                                            handoffs, streaming, structured outputs,
+                                            guardrails, WebSearchTool, deep research
+  3     3_crew          CrewAI              YAML agents/tasks, @CrewBase decorators,
+                                            sequential crews, SerperDevTool,
+                                            financial research, stock picker, debate
+  4     4_langgraph     LangGraph           StateGraph, reducers, MemorySaver,
+                                            SqliteSaver, Playwright browser,
+                                            evaluator multi-agent, Sidekick
+  5     5_autogen       AutoGen             AgentChat, RoundRobinGroupChat,
+                                            LangChainToolAdapter, AutoGen Core,
+                                            single runtime, distributed gRPC
+  6     6_mcp           MCP + Agents SDK    MCPServerStdio, custom MCP server/client,
+                                            memory, Brave Search, Polygon.io,
+                                            4-trader autonomous system, 44 tools
+
+================================================================================
+  PART 9: CAN GOOGLE GEMINI FREE API REPLACE EVERYTHING IN THIS CODEBASE?
+================================================================================
+
+SHORT ANSWER:
+  Partially — Gemini can replace the raw LLM calls and most LLM-dependent
+  features, but several parts of the codebase depend on OpenAI-specific
+  infrastructure (SDK features, hosted tools, tracing) that have no direct
+  Gemini free equivalents.
+
+  The codebase actually already uses Gemini in multiple places (Labs 2, 3),
+  so the integration path is well-established!
+
+------------------------------------------------------------------------
+GOOGLE GEMINI FREE TIER — WHAT YOU GET
+------------------------------------------------------------------------
+  Models available free (via Google AI Studio):
+    - gemini-1.5-flash          (fast, high rate limits)
+    - gemini-2.0-flash          (best free model, 15 RPM, 1500 RPD)
+    - gemini-2.5-flash          (used already in this course)
+    - gemini-2.5-pro             (limited free quota)
+
+  Free tier limits (Google AI Studio):
+    - 15 requests per minute (RPM)
+    - 1,000,000 tokens per minute (TPM)
+    - 1,500 requests per day (RPD)
+    — These limits can make looped/concurrent agent systems slow or blocked
+
+  API Access:
+    Native Gemini SDK:
+      from google.generativeai import GenerativeModel
+
+    OpenAI-compatible endpoint (already used in this codebase in Lab 2, 3):
+      gemini = OpenAI(
+          api_key=google_api_key,
+          base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+      )
+
+------------------------------------------------------------------------
+MODULE-BY-MODULE GEMINI COMPATIBILITY ANALYSIS
+------------------------------------------------------------------------
+
+MODULE 1 — FOUNDATIONS:
+  STATUS: FULLY COMPATIBLE ✓
+  - Lab 2 already uses Gemini via the OpenAI-compatible endpoint.
+  - Lab 3 already uses Gemini as the evaluator (gemini-2.5-flash).
+  - All raw API call patterns work with Gemini.
+  - REPLACEMENT: Replace OpenAI() with OpenAI(api_key=..., base_url=gemini_url)
+    or use google-generativeai SDK directly.
+
+MODULE 2 — OPENAI AGENTS SDK:
+  STATUS: PARTIALLY COMPATIBLE ⚠
+  - Lab 3 already shows how to plug Gemini into the Agents SDK using
+    OpenAIChatCompletionsModel wrapper — this works.
+  - Lab 4 uses WebSearchTool — this is an OpenAI HOSTED tool. Gemini has
+    Google Search grounding but it's not integrated into the Agents SDK.
+    You can replace WebSearchTool with SerperDevTool or Brave MCP server
+    as your search mechanism.
+  - Tracing (platform.openai.com/traces) is OpenAI-specific and won't
+    work with Gemini models, but the agents themselves will run.
+  - REPLACEMENT: Use OpenAIChatCompletionsModel(openai_client=gemini_async_client)
+    and replace WebSearchTool with a custom search tool.
+
+MODULE 3 — CREWAI:
+  STATUS: COMPATIBLE WITH CHANGES ⚠
+  - CrewAI uses litellm under the hood, which supports Gemini via:
+      llm: google/gemini-2.0-flash
+    in agents.yaml
+  - Install: pip install crewai[google]
+  - SerperDevTool still works (separate from the LLM)
+  - LIMITATION: Some CrewAI default behaviors assume OpenAI structure;
+    check CrewAI docs for Gemini-specific configuration.
+  - REPLACEMENT: Change llm: openai/gpt-4o-mini
+                 to    llm: google/gemini-2.0-flash in agents.yaml
+
+MODULE 4 — LANGGRAPH:
+  STATUS: FULLY COMPATIBLE ✓
+  - LangGraph is LLM-agnostic. The LLM is just an invoke() call.
+  - Install: langchain-google-genai (already in requirements)
+  - Replace: ChatOpenAI(model="gpt-4o-mini")
+    with:    ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+  - All graph structure, checkpointing, and tool patterns remain identical.
+  - LangSmith tracing is provider-agnostic.
+  - with_structured_output() works with Gemini models.
+  - REPLACEMENT: pip install langchain-google-genai
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+
+MODULE 5 — AUTOGEN:
+  STATUS: COMPATIBLE WITH CHANGES ⚠
+  - AutoGen supports Gemini via google-generativeai extension or via the
+    OpenAI-compatible endpoint:
+      from autogen_ext.models.openai import OpenAIChatCompletionClient
+      # Using Gemini's OpenAI-compatible endpoint:
+      model_client = OpenAIChatCompletionClient(
+          model="gemini-2.0-flash",
+          base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+          api_key=google_api_key,
+      )
+  - MCP tools in AutoGen (Lab 2) are provider-agnostic.
+  - gRPC distributed runtime (Lab 4) is LLM-agnostic.
+  - REPLACEMENT: Point OpenAIChatCompletionClient to Gemini endpoint.
+
+MODULE 6 — MCP:
+  STATUS: FULLY COMPATIBLE ✓ (with rate limit caution)
+  - MCP is a protocol standard — completely LLM-agnostic.
+  - The OpenAI Agents SDK wrapping is the only LLM-dependent part.
+  - Already shown in Lab 3: OpenAIChatCompletionsModel allows Gemini.
+  - All MCP servers (fetch, Playwright, filesystem, memory, Brave, Polygon)
+    work identically regardless of which LLM sits on top.
+  - The trading floor (Lab 5) can run with Gemini — it has a USE_MANY_MODELS
+    flag specifically designed to let you mix providers.
+  - RATE LIMIT WARNING: The trading floor runs 4+ agents in parallel loops.
+    Free tier (15 RPM) will cause rate limit errors. Stagger calls or use
+    the paid Gemini API for production use.
+  - REPLACEMENT: Set USE_MANY_MODELS=True and configure gemini models,
+    or replace gpt-4o-mini defaults in traders.py.
+
+------------------------------------------------------------------------
+THINGS GEMINI FREE CANNOT REPLACE
+------------------------------------------------------------------------
+
+  1. OPENAI WEBSEARCHTOOL (Module 2, Lab 4):
+     The WebSearchTool is an OpenAI-hosted tool billed per use ($0.025/call).
+     Gemini has Google Search grounding, but it's not in OpenAI Agents SDK.
+     WORKAROUND: Use SerperDevTool (needs SERPER_API_KEY, has free tier),
+     Brave Search MCP (needs BRAVE_API_KEY, has free tier), or
+     DuckDuckGo search via LangChain community tools (no API key needed).
+
+  2. OPENAI TRACES UI (platform.openai.com/traces):
+     The trace() context manager and trace viewer are OpenAI-specific.
+     WORKAROUND: Use LangSmith (langsmith.com) for tracing — it works
+     with any LLM and is supported across Modules 4 and 5.
+
+  3. RATE LIMITS IN PRODUCTION:
+     Free tier (15 RPM) is insufficient for the trading floor's parallel
+     4-agent concurrent execution. You will hit 429 errors.
+     WORKAROUND: Use Gemini paid API, or use free-tier Groq (very fast,
+     generous limits) as a fallback model for some agents.
+
+  4. OPENAI VECTOR STORES (FileSearchTool, Module 2):
+     The FileSearchTool uses OpenAI's proprietary vector store service.
+     No direct Gemini equivalent.
+     WORKAROUND: Use LangChain with Chroma or FAISS as a local vector
+     store + embeddings (can use Google's embedding-001 model for free).
+
+  5. OPENAI COMPUTER USE (ComputerTool):
+     Anthropic and OpenAI both have computer use. Gemini does not yet
+     offer an equivalent tool in this SDK context.
+
+------------------------------------------------------------------------
+RECOMMENDED FREE ALTERNATIVE STACK
+------------------------------------------------------------------------
+
+  If you want to run as much as possible for FREE, here is the recommended
+  combination:
+
+  TIER 1 LLM (primary, free):
+    Google Gemini 2.0 Flash (gemini-2.0-flash)
+    - Free via AI Studio, highest free rate limits
+    - Excellent function calling and structured output support
+    - Already integrated in this course (Labs 2, 3, 4 of Module 1)
+
+  TIER 2 LLM (fast/high-rate, free):
+    Groq (llama-3.3-70b-versatile or llama-3.1-8b-instant)
+    - Extremely fast inference, very generous free tier
+    - OpenAI-compatible endpoint — plug in anywhere
+
+  TIER 3 LLM (local/offline, free):
+    Ollama (llama3.2, qwen2.5-coder, mistral)
+    - Runs locally — no API cost, no rate limits, full privacy
+    - Already shown in Module 1 Labs 2, 3
+
+  SEARCH (free alternative to WebSearchTool):
+    DuckDuckGo (via langchain-community DuckDuckGoSearchRun, no API key)
+    or Brave Search free tier (BRAVE_API_KEY, 2000 free queries/month)
+
+  TRACING (free alternative to OpenAI traces):
+    LangSmith free tier (langsmith.com, already used in Module 4)
+
+  EMAIL (free alternative to SendGrid):
+    Any SMTP provider + smtplib (Python standard library)
+
+  EVERYTHING ELSE (MCP servers, LangGraph, AutoGen, frameworks):
+    All fully free — they are open-source frameworks, not billed services.
+
+------------------------------------------------------------------------
+GEMINI QUICK-START REPLACEMENT CODE
+------------------------------------------------------------------------
+
+  # .env — add these:
+  GOOGLE_API_KEY=your_key_from_aistudio.google.com
+
+  # Python — replace OpenAI with Gemini everywhere:
+
+  # Pattern 1: Direct API (works for all raw API calls in Module 1)
+  from openai import OpenAI
+  gemini = OpenAI(
+      api_key=os.environ["GOOGLE_API_KEY"],
+      base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+  )
+  response = gemini.chat.completions.create(
+      model="gemini-2.0-flash", messages=messages)
+
+  # Pattern 2: LangGraph (Module 4)
+  from langchain_google_genai import ChatGoogleGenerativeAI
+  llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+
+  # Pattern 3: OpenAI Agents SDK (Module 2, 6)
+  from openai import AsyncOpenAI
+  from agents import OpenAIChatCompletionsModel
+  gemini_async = AsyncOpenAI(
+      api_key=os.environ["GOOGLE_API_KEY"],
+      base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+  )
+  gemini_model = OpenAIChatCompletionsModel(
+      model="gemini-2.0-flash",
+      openai_client=gemini_async
+  )
+  agent = Agent(name="My Agent", model=gemini_model, instructions="...")
+
+  # Pattern 4: AutoGen (Module 5)
+  from autogen_ext.models.openai import OpenAIChatCompletionClient
+  model_client = OpenAIChatCompletionClient(
+      model="gemini-2.0-flash",
+      api_key=os.environ["GOOGLE_API_KEY"],
+      base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+  )
+
+  # Pattern 5: CrewAI (Module 3) — agents.yaml change only
+  # Change: llm: openai/gpt-4o-mini
+  # To:     llm: google/gemini-2.0-flash
+
+------------------------------------------------------------------------
+FINAL VERDICT
+------------------------------------------------------------------------
+
+  Google Gemini free tier is an EXCELLENT replacement for ~80-85% of
+  this codebase with minimal code changes. The integration pattern
+  (OpenAI-compatible endpoint) is already demonstrated in the course.
+
+  The remaining 15-20% that requires workarounds:
+    - WebSearchTool → use DuckDuckGo or Brave Search (both free)
+    - OpenAI Traces → use LangSmith (free tier available)
+    - Rate limits in the trading floor → throttle calls or use paid tier
+    - FileSearchTool/ComputerTool → use local vector stores instead
+
+  The course is excellently designed for provider independence — every
+  framework covered (LangGraph, AutoGen, CrewAI, MCP) abstracts away the
+  underlying LLM. This makes Gemini substitution relatively painless.
+
+  API KEY: Get your free Gemini API key at https://aistudio.google.com
+  Docs:    https://ai.google.dev/gemini-api/docs
+  Models:  https://ai.google.dev/gemini-api/docs/models
+
+================================================================================
+  END OF DOCUMENT
+================================================================================
