@@ -88,4 +88,5 @@ class StockPicker():
             verbose=True,
             manager_agent=manager,
             memory=False,
+            max_rpm=4,
         )
