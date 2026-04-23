@@ -1,4 +1,6 @@
+import os
 from autogen_core import MessageContext, RoutedAgent, message_handler
+from autogen_core.models import ModelInfo
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.messages import TextMessage
 from autogen_ext.models.openai import OpenAIChatCompletionClient
@@ -7,6 +9,23 @@ import random
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
+
+_gemini_api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("gemini_api_key")
+
+def _make_gemini_client(**kwargs):
+    return OpenAIChatCompletionClient(
+        model="gemini-2.5-flash",
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+        api_key=_gemini_api_key,
+        model_info=ModelInfo(
+            vision=False,
+            function_calling=True,
+            json_output=True,
+            structured_output=True,
+            family="openai",
+        ),
+        **kwargs,
+    )
 
 class Agent(RoutedAgent):
 
@@ -28,8 +47,7 @@ class Agent(RoutedAgent):
 
     def __init__(self, name) -> None:
         super().__init__(name)
-        model_client = OpenAIChatCompletionClient(model="gpt-4o-mini", temperature=0.7)
-        self._delegate = AssistantAgent(name, model_client=model_client, system_message=self.system_message)
+        self._delegate = AssistantAgent(name, model_client=_make_gemini_client(temperature=0.7), system_message=self.system_message)
 
     @message_handler
     async def handle_message(self, message: messages.Message, ctx: MessageContext) -> messages.Message:
